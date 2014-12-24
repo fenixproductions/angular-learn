@@ -14,11 +14,12 @@ var gulp = require('gulp'),
 	rename = require('gulp-rename'),
 //	concat = require('gulp-concat'),
 	notify = require('gulp-notify'),
-	del = require('del');
+	del = require('del'),
+	filter = require('gulp-filter');
 
 // Styles
 gulp.task('styles', function () {
-	return gulp.src('src/styles/main.scss')
+	return gulp.src('src/styles/style.scss')
 		.pipe(sass({style: 'expanded',}))
 		//.pipe(autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'))
 		.pipe(gulp.dest('dist/styles'))
@@ -26,6 +27,22 @@ gulp.task('styles', function () {
 		//.pipe(minifycss())
 		//.pipe(gulp.dest('dist/styles'))
 		.pipe(notify({message: 'Styles task complete'}));
+});
+
+gulp.task('more-styles', function () {
+	var iecssFilter = gulpFilter('**/ie*.css');
+	var iepatchFilter = gulpFilter('**/PIE.htc');
+
+	return gulp.src('src/styles/**/*')
+		.pipe(iecssFilter)
+		.pipe(gulp.dest('dist/styles'))
+		.pipe(iecssFilter.restore())
+		.pipe(gulp.dest('dist/styles'))
+		.pipe(iepatchFilter)
+		.pipe(gulp.dest('dist/styles'))
+		.pipe(iepatchFilter.restore())
+		.pipe(gulp.dest('dist/styles'))
+		.pipe(notify({message: 'More styles task complete'}));
 });
 
 // Scripts
@@ -63,7 +80,7 @@ gulp.task('clean', function (cb) {
 
 // Default task
 gulp.task('default', ['clean'], function () {
-	gulp.start('styles', 'scripts', 'images', 'pages', 'watch');
+	gulp.start('styles');//, 'scripts', 'images', 'pages', 'watch');
 });
 
 // Watch
